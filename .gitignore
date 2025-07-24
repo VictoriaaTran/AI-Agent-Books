@@ -1,0 +1,15 @@
+# Ignore Python cache and logs
+__pycache__/
+*.pyc
+*.log
+
+# Ignore virtual environment folder
+venv/
+
+# Ignore data and local secrets
+Data/
+*.env
+*.sqlite3
+
+# Ignore model and vector store
+Chroma/

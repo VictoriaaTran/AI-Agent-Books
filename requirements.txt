@@ -1,0 +1,11 @@
+langchain
+chromadb
+pypdf
+pytest
+chromadb
+langchain-community
+langchain-ollama
+langchain-chroma
+streamlit
+
+
