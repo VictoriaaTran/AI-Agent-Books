@@ -1,6 +1,4 @@
-from langchain.chains import RetrievalQA
 from langchain_chroma import Chroma 
-from langchain_ollama import OllamaEmbeddings
 from langchain_ollama import OllamaLLM
 from langchain.prompts import ChatPromptTemplate
 from load_document import get_embedding_func

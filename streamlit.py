@@ -9,13 +9,20 @@ question = st.text_input("Enter Question:")
 
 if question.strip():
     with st.spinner("Searching..."):
-        context_text, result = get_context(question)
-        prompt = generate_prompt(question, context_text)
-        response, sources = get_response(prompt, result)
-        st.write("#### Answer:")
-        st.write(response)
+        try:
+            context_text, result = get_context(question)
+            if not context_text:
+                st.write("No relevant context found. Please rephrase your question.")
+            else:
+                prompt = generate_prompt(question, context_text)
+                response, sources = get_response(prompt, result)
+                st.write("#### Answer:")
+                st.write(response)
 
-        source_name = Path(sources[0]).stem
-        st.write("Sources: ", source_name if sources else "No sources found.")
-
-        
+                if sources:
+                    source_name = Path(sources[0]).stem
+                    st.write("Sources: ", source_name)
+                else:
+                    st.write("Sources: No sources found.")
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
