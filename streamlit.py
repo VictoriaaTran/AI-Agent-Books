@@ -1,4 +1,5 @@
 import streamlit as st
+from pathlib import Path
 from query_input import get_context, generate_prompt, get_response
 
 st.title("Lord of the Rings QA 📚")
@@ -12,7 +13,9 @@ if question.strip():
         prompt = generate_prompt(question, context_text)
         response, sources = get_response(prompt, result)
         st.write("#### Answer:")
-        st.write("Sources: ", sources if sources else "No sources found.")
         st.write(response)
+
+        source_name = Path(sources[0]).stem
+        st.write("Sources: ", source_name if sources else "No sources found.")
 
         
