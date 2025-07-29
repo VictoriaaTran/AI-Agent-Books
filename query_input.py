@@ -3,53 +3,64 @@ from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 from langchain_ollama import OllamaLLM
 from langchain.prompts import ChatPromptTemplate
-from load_document import embedding_function
+from load_document import get_embedding_func
 
 
 CHROMA_PATH = "Chroma"
 
 TEMPLATE = """
     Use the following context to answer questions:
-
-    Context:
     {context}
-
-    Question:
-    {question}
-
-    Answer:
+    ---
+    Question:{question}
+    ANSWER:
     """
 
-def query_rag(query_text:str):
-
-    # get the db
-    embedding_func = embedding_function
-    db = Chroma(
+def get_context(query_text:str):
+    # get the relevant context from the vector database
+    context_text = ""
+    embedding_func = get_embedding_func()
+    vector_db = Chroma(
         persist_directory=CHROMA_PATH,
         embedding_function=embedding_func,
     )
 
-    # search db for results
-    result = db.similarity_search_with_score(query_text, k=1)
+    # get the result based on similarity search (k=2 means we get 2 most similar documents) 
+    result = vector_db.similarity_search(query_text, k=2)
 
-    context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in result])
+    # format the context text from the results
+    context_text = "\n\n---\n\n".join([doc.page_content for doc in result])
+    return context_text, result
+
+def generate_prompt(query_text:str, context_text:str):
+    # create the prompt template
     prompt_template = ChatPromptTemplate.from_template(TEMPLATE)
     prompt = prompt_template.format(
         context=context_text,
         question=query_text
     )
+    # print(f"Prompt: {prompt}")
+    return prompt
 
+
+def get_response(prompt:str, result:list):
+    # invoke the LLM with the prompt to search for relevant answer response
     model = OllamaLLM(model='llama3.2')
     response_text = model.invoke(prompt)
+    
+    # get sources from the result
+    sources = [doc.metadata.get('source', 'page_number') for doc in result]
+    sources_text = ', '.join(sources)
 
-    # sources = [doc.metadata.get('source', None) for doc, _score in result]
-    # print('\n')
     formatted_response = f"{response_text}"
-    # print(formatted_response)
-    return formatted_response
+    return formatted_response, sources_text
 
-# def main():
-#     query_text = input("Question:")
-#     print(query_rag(query_text))
-            
-# main()
+def main():
+    question = input("Ask a question: ")
+    context_text, result = get_context(question)
+    prompt = generate_prompt(question, context_text)
+    get_response(prompt, result)
+    # print(response)
+
+if __name__ == "__main__":
+    main()
