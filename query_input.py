@@ -1,4 +1,5 @@
 from langchain_chroma import Chroma 
+import chromadb
 from langchain_ollama import OllamaLLM
 from langchain.prompts import ChatPromptTemplate
 from load_document import get_embedding_func
@@ -54,12 +55,11 @@ def get_response(prompt:str, result:list):
     formatted_response = f"{response_text}"
     return formatted_response, sources
 
-def main():
-    question = input("Ask a question: ")
-    context_text, result = get_context(question)
-    prompt = generate_prompt(question, context_text)
-    get_response(prompt, result)
+
+# question = input("Ask a question: ")
+# context_text, result = get_context(question)
+# prompt = generate_prompt(question, context_text)
+# get_response(prompt, result)
     # print(f"{response}: \n{source[0] if source else 'No sources found.'}")
 
-if __name__ == "__main__":
-    main()
+
